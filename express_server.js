@@ -23,6 +23,11 @@ app.get("/hello", (req,res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
 
+// Route handlers for urls
+app.get("/urls", (req, res) => {
+  const templateVars = { urls: urlDatabase };
+  res.render("urls_index", templateVars);
+});
 
 // When you connect to the server using node express_server.js, it should read "Example app listening on port 8080". Otherwise it's not working right!
 app.listen(PORT, () => {

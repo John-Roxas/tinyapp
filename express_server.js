@@ -29,6 +29,11 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
+app.get("/urls:id", (req,res) => {
+  const templateVars = { id: req.params.id, longURL: templateVars[req.params.id]};
+  res.render("urls_show", templateVars);
+});
+
 // When you connect to the server using node express_server.js, it should read "Example app listening on port 8080". Otherwise it's not working right!
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);

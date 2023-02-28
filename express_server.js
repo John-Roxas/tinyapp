@@ -11,9 +11,15 @@ app.get("/", (req,res) => {
   res.send('Hello!');
 });
 
+// Route to get the links in urlDatabase and print is out as a json object
 app.get("/urls.json", (req,res) => {
   res.json(urlDatabase);
 });
+
+app.get("/hello", (req,res) => {
+  res.send("<html><body>Hello <b>World</b></body></html>\n");
+});
+
 
 // When you connect to the server using node express_server.js, it should read "Example app listening on port 8080". Otherwise it's not working right!
 app.listen(PORT, () => {

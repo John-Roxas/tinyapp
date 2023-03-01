@@ -24,13 +24,6 @@ const urlDatabase = {
 // Important that this comes before all of our routes!
 app.use(express.urlencoded({ extended: true}));
 
-app.post("/urls", (req,res) => {
-  // console.log(req.body); // Log the POST request body to the console
-  let newKey = generateRandomString();
-  urlDatabase[newKey] = req.body.longURL;
-  res.send("Ok"); // Respond with 'Ok'
-  // console.log(urlDatabase);
-});
 
 app.get("/", (req,res) => {
   res.send('Hello!');
@@ -63,7 +56,12 @@ app.get("/urls/:id", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
+app.post("/urls", (req,res) => {
+  let newKey = generateRandomString();
+  urlDatabase[newKey] = req.body.longURL;
+  res.redirect(`/urls/:${newKey}`); // Redirects to urls/newKey
 
+});
 
 // When you connect to the server using node express_server.js, it should read "Example app listening on port 8080". Otherwise it's not working right!
 app.listen(PORT, () => {

@@ -25,8 +25,11 @@ const urlDatabase = {
 app.use(express.urlencoded({ extended: true}));
 
 app.post("/urls", (req,res) => {
-  console.log(req.body); // Log the POST request body to the console
+  // console.log(req.body); // Log the POST request body to the console
+  let newKey = generateRandomString();
+  urlDatabase[newKey] = req.body.longURL;
   res.send("Ok"); // Respond with 'Ok'
+  // console.log(urlDatabase);
 });
 
 app.get("/", (req,res) => {

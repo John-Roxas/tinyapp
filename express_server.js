@@ -56,11 +56,22 @@ app.get("/urls/:id", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
+// app.get("/u/:id", (req, res) => {
+// const longURL = urlDatabase[req.params.id];
+// console.log(longURL);
+// res.redirect(longURL);
+// });
+
 app.post("/urls", (req,res) => {
   let newKey = generateRandomString();
   urlDatabase[newKey] = req.body.longURL;
   res.redirect(`/urls/:${newKey}`); // Redirects to urls/newKey
 
+});
+
+app.get("/u/:id", (req, res) => {
+  const longURL = urlDatabase[req.params.id.slice(1)];
+  res.redirect(longURL);
 });
 
 // When you connect to the server using node express_server.js, it should read "Example app listening on port 8080". Otherwise it's not working right!

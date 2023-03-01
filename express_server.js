@@ -9,6 +9,14 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+// Important that this comes before all of our routes!
+app.use(express.urlencoded({ extended: true}));
+
+app.post("/urls", (req,res) => {
+  console.log(req.body); // Log the POST request body to the console
+  res.send("Ok"); // Respond with 'Ok'
+});
+
 app.get("/", (req,res) => {
   res.send('Hello!');
 });
@@ -29,10 +37,18 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
+// Route handler for entering new URLs
+app.get("/urls/new", (req, res) => {
+  res.render("urls_new");
+});
+
+// Route handler for urls that are pointing at a specific ID in urlDatabase
 app.get("/urls/:id", (req, res) => {
   const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id]};
   res.render("urls_show", templateVars);
 });
+
+
 
 // When you connect to the server using node express_server.js, it should read "Example app listening on port 8080". Otherwise it's not working right!
 app.listen(PORT, () => {

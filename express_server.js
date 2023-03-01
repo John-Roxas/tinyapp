@@ -2,6 +2,18 @@ const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
 
+const generateRandomString = () => {
+  let result = "";
+  // Declaring all valid characters for the random string. No symbols allowed!
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  
+  const charLength = characters.length;
+  for (let i = 0; i < 6; i++) {
+    result += characters[Math.floor(Math.random() * charLength)];
+  }
+  return result;
+};
+
 app.set("view engine", "ejs");
 
 const urlDatabase = {

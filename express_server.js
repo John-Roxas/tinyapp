@@ -56,9 +56,15 @@ app.get("/urls/:id", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
-
+// Route handler to delete entries in our app!
 app.post("/urls/:id/delete", (req,res) => {
   delete urlDatabase[req.params.id];
+  res.redirect(`/urls`);
+});
+
+// Route handler which edits the LongURLs in our app!
+app.post("/urls/:id/edit", (req,res) => {
+  urlDatabase[req.params.id] = req.body.longURL;
   res.redirect(`/urls`);
 });
 

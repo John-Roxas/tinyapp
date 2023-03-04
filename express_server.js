@@ -3,6 +3,7 @@ const app = express();
 const PORT = 8080; // default port 8080
 const cookieParser = require('cookie-parser');
 
+
 // In order to expose req.cookies. We must first run the cookieParser() function on our app! This function parses the cookier header on the request.
 app.use(cookieParser());
 
@@ -55,7 +56,13 @@ app.get("/urls", (req, res) => {
 
 // Route handler for entering new URLs
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+
+  const templateVars = {
+    username: req.cookies["username"],
+    urls: urlDatabase
+  };
+
+  res.render("urls_new", templateVars);
 });
 
 // Route handler for urls that are pointing at a specific ID in urlDatabase
@@ -68,34 +75,31 @@ app.get("/urls/:id", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
-// Route handler to delete entries in our app!
+// Post method to delete entries in our app!
 app.post("/urls/:id/delete", (req,res) => {
   delete urlDatabase[req.params.id];
   res.redirect(`/urls`);
 });
 
-// Route handler which edits the LongURLs in our app!
+// Post method which edits the LongURLs in our app!
 app.post("/urls/:id/edit", (req,res) => {
   urlDatabase[req.params.id] = req.body.longURL;
   res.redirect(`/urls`);
 });
 
+// Post method to handle logins
 app.post("/login", (req,res) => {
   res.cookie('username', req.body.username);
   res.redirect(`/urls`);
 });
 
+// Post method to handle logouts
 app.post("/logout", (req,res) => {
   res.cookie('username', "");
   res.redirect(`/urls`);
 });
 
-// app.get("/u/:id", (req, res) => {
-// const longURL = urlDatabase[req.params.id];
-// console.log(longURL);
-// res.redirect(longURL);
-// });
-
+// Post method to generate a new random 6 character string and attach it as the key of the url entered in the form on urls/new
 app.post("/urls", (req,res) => {
   let newKey = generateRandomString();
   urlDatabase[newKey] = req.body.longURL;
@@ -103,6 +107,7 @@ app.post("/urls", (req,res) => {
 
 });
 
+// Route handler for viewing an individual URL
 app.get("/u/:id", (req, res) => {
   const longURL = urlDatabase[req.params.id.slice(1)];
   res.redirect(longURL);

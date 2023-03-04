@@ -18,27 +18,30 @@
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>                 
       </div>
     </div>
-    <% if(username !== "") { %>
-      <p class="nav-item nav-link">Current User: <%= username %></p>
-    <% } %>
-    <% if(username === "") { %>
-      <form class="form-inline" action="/login" method="POST">
-        <div class="form-group mb-2">
-            <input
-              class="form-inline"
-              type="text"
-              name="username"
-              placeholder="Username"
-              style="width: 100px; margin: 1em"
-            />
-          <button type="submit" class="btn btn-primary">Login</button>
-        </div>
-      </form>
-    <% } else{ %>
-      <form class="form-inline" action="/logout" method="POST">
-        <button type="submit" class="btn btn-primary">Logout</button>
-      </form>
-    <% } %>
-
+    <div>
+      <% if(username !== "") { %>
+        <p>Current User: <%= username %></p>
+      <% } %>
+    </div>
+    <div>      
+      <% if(username === "") { %>
+        <form class="form-inline" action="/login" method="POST">
+          <div class="form-group mb-2">
+              <input
+                class="form-inline"
+                type="text"
+                name="username"
+                placeholder="Username"
+                style="width: 100px; margin: 1em"
+              />
+            <button type="submit" class="btn btn-primary">Login</button>
+          </div>
+        </form>
+      <% } else{ %>
+        <form class="form-inline" action="/logout" method="POST">
+          <button type="submit" class="btn btn-primary">Logout</button>
+        </form>
+      <% } %>
+    </div>
   </nav>
 </header>

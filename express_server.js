@@ -109,7 +109,19 @@ app.get("/u/:id", (req, res) => {
   res.redirect(longURL);
 });
 
-console.log();
+// Route for the /register endpoint
+app.get("/register", (req, res) => {
+  const templateVars = {
+    username: req.cookies["username"],
+    urls: urlDatabase,
+  };
+  res.render(`register`, templateVars);
+});
+
+app.post("/userReg", (req, res) => {
+  console.log(req.body);
+  res.redirect(`/urls`);
+});
 
 // When you connect to the server using node express_server.js, it should read "Example app listening on port 8080". Otherwise it's not working right!
 app.listen(PORT, () => {

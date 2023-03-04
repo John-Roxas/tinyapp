@@ -29,6 +29,11 @@ const urlDatabase = {
 
 // Database where all of our user and password information is stored.
 const users = {
+  // Need the blank case, or else everything breaks on logout!
+  "": {
+    id: "",
+    email: "",
+  },
   userRandomID: {
     id: "userRandomID",
     email: "user@example.com",
@@ -37,6 +42,11 @@ const users = {
   user2RandomID: {
     id: "user2RandomID",
     email: "user2@example.com",
+    password: "dishwasher-funk",
+  },
+  test32: {
+    id: "user3RandomID",
+    email: "user3@example.com",
     password: "dishwasher-funk",
   },
 };
@@ -61,8 +71,9 @@ app.get("/hello", (req, res) => {
 // Route handlers for urls
 app.get("/urls", (req, res) => {
   const templateVars = {
-    username: req.cookies["username"],
+    username: users[req.cookies["userID"]].email,
     urls: urlDatabase,
+    users,
   };
   res.render("urls_index", templateVars);
 });
@@ -70,7 +81,7 @@ app.get("/urls", (req, res) => {
 // Route handler for entering new URLs
 app.get("/urls/new", (req, res) => {
   const templateVars = {
-    username: req.cookies["username"],
+    username: users[req.cookies["userID"]].email,
     urls: urlDatabase,
   };
 
@@ -80,7 +91,7 @@ app.get("/urls/new", (req, res) => {
 // Route handler for urls that are pointing at a specific ID in urlDatabase
 app.get("/urls/:id", (req, res) => {
   const templateVars = {
-    username: req.cookies["username"],
+    username: users[req.cookies["userID"]].email,
     id: req.params.id,
     longURL: urlDatabase[req.params.id],
   };
@@ -102,7 +113,12 @@ app.post("/urls/:id/edit", (req, res) => {
 // Post method to handle logins
 app.post("/login", (req, res) => {
   // sets the cookie username to what gets entered in the login form.
-  res.cookie("username", req.body.username);
+  for (const key in users) {
+    if (users[key].email === req.body.username) {
+      res.cookie("userID", key);
+      console.log("Success Login");
+    }
+  }
   // redirects to the /urls page
   res.redirect(`/urls`);
 });
@@ -110,7 +126,7 @@ app.post("/login", (req, res) => {
 // Post method to handle logouts
 app.post("/logout", (req, res) => {
   // sets the cookie to be blank upon logout.
-  res.cookie("username", "");
+  res.cookie("userID", "");
   // redirects to the /urls page
   res.redirect(`/urls`);
 });
@@ -131,8 +147,9 @@ app.get("/u/:id", (req, res) => {
 // Route for the /register endpoint
 app.get("/register", (req, res) => {
   const templateVars = {
-    username: req.cookies["username"],
+    username: users[req.cookies["userID"]].email,
     urls: urlDatabase,
+    users,
   };
   res.render(`register`, templateVars);
 });

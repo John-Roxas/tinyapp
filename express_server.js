@@ -21,9 +21,24 @@ const generateRandomString = () => {
 
 app.set("view engine", "ejs");
 
+// Database where all of our short URL IDs and longURL pairs are stored.
 const urlDatabase = {
   b2xVn2: "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com",
+};
+
+// Database where all of our user and password information is stored.
+const users = {
+  userRandomID: {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur",
+  },
+  user2RandomID: {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "dishwasher-funk",
+  },
 };
 
 // Important that this comes before all of our routes!
@@ -86,13 +101,17 @@ app.post("/urls/:id/edit", (req, res) => {
 
 // Post method to handle logins
 app.post("/login", (req, res) => {
+  // sets the cookie username to what gets entered in the login form.
   res.cookie("username", req.body.username);
+  // redirects to the /urls page
   res.redirect(`/urls`);
 });
 
 // Post method to handle logouts
 app.post("/logout", (req, res) => {
+  // sets the cookie to be blank upon logout.
   res.cookie("username", "");
+  // redirects to the /urls page
   res.redirect(`/urls`);
 });
 
@@ -120,6 +139,18 @@ app.get("/register", (req, res) => {
 
 app.post("/userReg", (req, res) => {
   console.log(req.body);
+  const newUserID = generateRandomString();
+
+  // Creates a new user in our users global object. req.body.newEmail and req.body.newPassword come from whatever is entered into the form on our register page.
+  users[newUserID] = {
+    id: newUserID,
+    email: req.body.newEmail,
+    password: req.body.newPassword,
+  };
+
+  // Sets a user_id cookie using the new user's generated ID.
+  res.cookie("userID", newUserID);
+  // redirects to the /urls page
   res.redirect(`/urls`);
 });
 

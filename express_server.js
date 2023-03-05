@@ -6,6 +6,7 @@ const cookieParser = require("cookie-parser");
 // In order to expose req.cookies. We must first run the cookieParser() function on our app! This function parses the cookier header on the request.
 app.use(cookieParser());
 
+// Global function to generate a 6 character random string when called.
 const generateRandomString = () => {
   let result = "";
   // Declaring all valid characters for the random string. No symbols allowed!
@@ -19,6 +20,18 @@ const generateRandomString = () => {
   return result;
 };
 
+// Global function to lookup whether an email address exists in our database of users. Returns the 6 character userID identifier if found.
+const emailLookup = (email, users) => {
+  for (const key in users) {
+    console.log(users[key]);
+    if (users[key].email === email) {
+      console.log(users[key].email);
+      return key;
+    }
+  }
+  return "";
+};
+
 app.set("view engine", "ejs");
 
 // Database where all of our short URL IDs and longURL pairs are stored.
@@ -29,10 +42,12 @@ const urlDatabase = {
 
 // Database where all of our user and password information is stored.
 const users = {
-  // Need the blank case, or else everything breaks on logout!
+  // Need the blank case, or else everything breaks on logout
+
   "": {
     id: "",
     email: "",
+    password: null,
   },
   userRandomID: {
     id: "userRandomID",
@@ -113,13 +128,8 @@ app.post("/urls/:id/edit", (req, res) => {
 // Post method to handle logins
 app.post("/login", (req, res) => {
   // sets the cookie username to what gets entered in the login form.
-  for (const key in users) {
-    if (users[key].email === req.body.username) {
-      res.cookie("userID", key);
-      console.log("Success Login");
-    }
-  }
-  // redirects to the /urls page
+  const loginKey = emailLookup(req.body.username, users);
+  res.cookie("userID", loginKey);
   res.redirect(`/urls`);
 });
 
@@ -154,16 +164,27 @@ app.get("/register", (req, res) => {
   res.render(`register`, templateVars);
 });
 
+// Post method for user registration!
 app.post("/userReg", (req, res) => {
   console.log(req.body);
   const newUserID = generateRandomString();
+  if (req.body.newEmail === "" || req.body.newPassword === "") {
+    // Send an error if the user tries to register with either a blank email address or blank password field
+    res.status(400);
+    res.send("Cannot accept an empty username or password. Try Again!");
+  } else if (emailLookup(req.body.newEmail, users) !== "") {
+    // Send an error IF the user tries to register an email that is already in the database
+    res.status(400);
+    res.send("User is already registered! Try Again!");
+  } else {
+    users[newUserID] = {
+      id: newUserID,
+      email: req.body.newEmail,
+      password: req.body.newPassword,
+    };
+  }
 
   // Creates a new user in our users global object. req.body.newEmail and req.body.newPassword come from whatever is entered into the form on our register page.
-  users[newUserID] = {
-    id: newUserID,
-    email: req.body.newEmail,
-    password: req.body.newPassword,
-  };
 
   // Sets a user_id cookie using the new user's generated ID.
   res.cookie("userID", newUserID);

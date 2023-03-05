@@ -43,7 +43,11 @@ const urlDatabase = {
 // Database where all of our user and password information is stored.
 const users = {
   // Need the blank case, or else everything breaks on logout
-
+  [undefined]: {
+    email: "",
+    id: "",
+    password: null,
+  },
   "": {
     id: "",
     email: "",
@@ -165,8 +169,9 @@ app.get("/register", (req, res) => {
 });
 
 // Post method for user registration!
+// Creates a new user in our users global object. req.body.newEmail and req.body.newPassword come from whatever is entered into the form on our register page.
+
 app.post("/userReg", (req, res) => {
-  console.log(req.body);
   const newUserID = generateRandomString();
   if (req.body.newEmail === "" || req.body.newPassword === "") {
     // Send an error if the user tries to register with either a blank email address or blank password field
@@ -184,12 +189,19 @@ app.post("/userReg", (req, res) => {
     };
   }
 
-  // Creates a new user in our users global object. req.body.newEmail and req.body.newPassword come from whatever is entered into the form on our register page.
-
   // Sets a user_id cookie using the new user's generated ID.
   res.cookie("userID", newUserID);
   // redirects to the /urls page
   res.redirect(`/urls`);
+});
+
+app.get("/login", (req, res) => {
+  const templateVars = {
+    username: users[req.cookies["userID"]].email,
+    urls: urlDatabase,
+    users,
+  };
+  res.render(`login`, templateVars);
 });
 
 // When you connect to the server using node express_server.js, it should read "Example app listening on port 8080". Otherwise it's not working right!

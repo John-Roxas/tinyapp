@@ -154,9 +154,15 @@ app.post("/logout", (req, res) => {
 
 // Post method to generate a new random 6 character string and attach it as the key of the url entered in the form on urls/new
 app.post("/urls", (req, res) => {
-  let newKey = generateRandomString();
-  urlDatabase[newKey] = req.body.longURL;
-  res.redirect(`/urls/:${newKey}`); // Redirects to urls/newKey
+  if (req.cookies["userID"] === undefined || req.cookies["userID"] === "") {
+    res.send("Error, must be logged in to create new short URLs");
+  } else {
+    if (req.body.longURL !== "") {
+      let newKey = generateRandomString();
+      urlDatabase[newKey] = req.body.longURL;
+      res.redirect(`/urls/:${newKey}`); // Redirects to urls/newKey
+    }
+  }
 });
 
 // Route handler for viewing an individual URL

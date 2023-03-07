@@ -107,6 +107,16 @@ app.get("/urls/new", (req, res) => {
 
 // Route handler for urls that are pointing at a specific ID in urlDatabase
 app.get("/urls/:id", (req, res) => {
+  let exist = false;
+  for (const key in urlDatabase) {
+    if (req.params.id === key) {
+      exist = true;
+    }
+  }
+  if (exist === false) {
+    res.status(403).send("Error SHORT URL does not exist");
+  }
+
   const templateVars = {
     username: users[req.cookies["userID"]].email,
     id: req.params.id,
@@ -133,11 +143,9 @@ app.post("/login", (req, res) => {
   const loginKey = emailLookup(req.body.username, users);
 
   if (loginKey === "") {
-    res.send("Error 403 USER NOT FOUND");
-    res.status(403);
+    res.status(403).send("Error 403 USER NOT FOUND");
   } else if (users[loginKey].password !== req.body.password) {
-    res.send("Error 403 INCORRECT PASSWORD");
-    res.status(403);
+    res.status(403).send("Error 403 INCORRECT PASSWORD");
   } else {
     res.cookie("userID", loginKey);
     res.redirect(`/urls`);

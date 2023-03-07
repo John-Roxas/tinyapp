@@ -186,8 +186,8 @@ app.post("/login", (req, res) => {
 
 // Post method to handle logouts
 app.post("/logout", (req, res) => {
-  // sets the cookie to be blank upon logout.
-  res.cookie("userID", "");
+  // clears the cookie when you hit the logout button.
+  res.clearCookie("userID");
   // redirects to the /urls page
   res.redirect(`/login`);
 });

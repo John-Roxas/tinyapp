@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
 const cookieParser = require("cookie-parser");
+const bcrypt = require("bcryptjs");
 
 // In order to expose req.cookies. We must first run the cookieParser() function on our app! This function parses the cookier header on the request.
 app.use(cookieParser());
@@ -72,20 +73,11 @@ const users = {
     email: "",
     password: null,
   },
-  userRandomID: {
-    id: "userRandomID",
-    email: "user@example.com",
-    password: "purple-monkey-dinosaur",
-  },
-  user2RandomID: {
-    id: "user2RandomID",
-    email: "user2@example.com",
-    password: "dishwasher-funk",
-  },
+  // For test purposes only
   test32: {
     id: "user3RandomID",
-    email: "user3@example.com",
-    password: "test",
+    email: "test@test.com",
+    password: bcrypt.hashSync("test", 10),
   },
 };
 
@@ -175,7 +167,9 @@ app.post("/login", (req, res) => {
   if (loginKey === "") {
     res.status(403).send("Error 403 USER NOT FOUND");
     // Checks if the password is correct
-  } else if (users[loginKey].password !== req.body.password) {
+  } else if (
+    bcrypt.compareSync(req.body.password, users[loginKey].password) === false
+  ) {
     res.status(403).send("Error 403 INCORRECT PASSWORD");
   } else {
     // sets the cookie username to what gets entered in the login form.
@@ -240,7 +234,7 @@ app.post("/userReg", (req, res) => {
     users[newUserID] = {
       id: newUserID,
       email: req.body.newEmail,
-      password: req.body.newPassword,
+      password: bcrypt.hashSync(req.body.newPassword, 10),
     };
   }
 

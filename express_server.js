@@ -30,15 +30,32 @@ const emailLookup = (email, users) => {
   return "";
 };
 
+// Global function to sort through all urls for a certain userID.
+const urlsForUser = (id, users) => {
+  const resultObject = {};
+  for (const key in users) {
+    if (users[key].userID === id || users[key].userID === "EXAMPLE") {
+      resultObject[key] = users[key];
+    }
+  }
+  return resultObject;
+};
+
 app.set("view engine", "ejs");
 
 // Database where all of our short URL IDs and longURL pairs are stored.
 const urlDatabase = {
   b2xVn2: {
     longURL: "http://www.lighthouselabs.ca",
+    userID: "EXAMPLE",
   },
   "9sm5xK": {
     longURL: "http://www.google.com",
+    userID: "EXAMPLE",
+  },
+  b2xVn5: {
+    longURL: "https://www.youtube.com",
+    userID: "test32",
   },
 };
 
@@ -93,7 +110,7 @@ app.get("/hello", (req, res) => {
 app.get("/urls", (req, res) => {
   const templateVars = {
     username: users[req.cookies["userID"]].email,
-    urls: urlDatabase,
+    urls: urlsForUser(req.cookies["userID"], urlDatabase),
     users,
   };
   res.render("urls_index", templateVars);
@@ -175,6 +192,7 @@ app.post("/urls", (req, res) => {
       let newKey = generateRandomString();
       urlDatabase[newKey] = {};
       urlDatabase[newKey].longURL = req.body.longURL;
+      urlDatabase[newKey].userID = req.cookies["userID"];
       res.redirect(`/urls/${newKey}`); // Redirects to urls/newKey
     }
   }

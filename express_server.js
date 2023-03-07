@@ -129,7 +129,6 @@ app.get("/urls/new", (req, res) => {
 // Route handler for urls that are pointing at a specific ID in urlDatabase
 app.get("/urls/:id", (req, res) => {
   let exist = false;
-  console.log(req.params.id);
   for (const key in urlDatabase) {
     if (req.params.id === key) {
       exist = true;
@@ -156,7 +155,11 @@ app.post("/urls/:id/delete", (req, res) => {
 
 // Post method which edits the LongURLs in our app!
 app.post("/urls/:id/edit", (req, res) => {
-  urlDatabase[req.params.id] = req.body.longURL;
+  // the if statement will allow edits only IF we are the correct user
+  if (req.cookies["userID"] === urlDatabase[req.params.id].userID) {
+    urlDatabase[req.params.id].longURL = req.body.longURL;
+  }
+
   res.redirect(`/urls`);
 });
 

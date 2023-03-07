@@ -170,14 +170,15 @@ app.post("/urls/:id/edit", (req, res) => {
 
 // Post method to handle logins
 app.post("/login", (req, res) => {
-  // sets the cookie username to what gets entered in the login form.
   const loginKey = emailLookup(req.body.username, users);
-
+  // Checks if the user exists in our object of users
   if (loginKey === "") {
     res.status(403).send("Error 403 USER NOT FOUND");
+    // Checks if the password is correct
   } else if (users[loginKey].password !== req.body.password) {
     res.status(403).send("Error 403 INCORRECT PASSWORD");
   } else {
+    // sets the cookie username to what gets entered in the login form.
     res.cookie("userID", loginKey);
     res.redirect(`/urls`);
   }

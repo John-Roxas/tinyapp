@@ -149,7 +149,12 @@ app.get("/urls/:id", (req, res) => {
 
 // Post method to delete entries in our app!
 app.post("/urls/:id/delete", (req, res) => {
-  delete urlDatabase[req.params.id];
+  if (req.cookies["userID"] === urlDatabase[req.params.id].userID) {
+    delete urlDatabase[req.params.id];
+  } else {
+    res.send("You cannot delete short URLS you do not own!");
+  }
+
   res.redirect(`/urls`);
 });
 

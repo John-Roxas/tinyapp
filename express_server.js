@@ -23,9 +23,7 @@ const generateRandomString = () => {
 // Global function to lookup whether an email address exists in our database of users. Returns the 6 character userID identifier if found.
 const emailLookup = (email, users) => {
   for (const key in users) {
-    console.log(users[key]);
     if (users[key].email === email) {
-      console.log(users[key].email);
       return key;
     }
   }
@@ -66,7 +64,7 @@ const users = {
   test32: {
     id: "user3RandomID",
     email: "user3@example.com",
-    password: "dishwasher-funk",
+    password: "test",
   },
 };
 
@@ -133,8 +131,17 @@ app.post("/urls/:id/edit", (req, res) => {
 app.post("/login", (req, res) => {
   // sets the cookie username to what gets entered in the login form.
   const loginKey = emailLookup(req.body.username, users);
-  res.cookie("userID", loginKey);
-  res.redirect(`/urls`);
+
+  if (loginKey === "") {
+    res.send("Error 403 USER NOT FOUND");
+    res.status(403);
+  } else if (users[loginKey].password !== req.body.password) {
+    res.send("Error 403 INCORRECT PASSWORD");
+    res.status(403);
+  } else {
+    res.cookie("userID", loginKey);
+    res.redirect(`/urls`);
+  }
 });
 
 // Post method to handle logouts
@@ -142,7 +149,7 @@ app.post("/logout", (req, res) => {
   // sets the cookie to be blank upon logout.
   res.cookie("userID", "");
   // redirects to the /urls page
-  res.redirect(`/urls`);
+  res.redirect(`/login`);
 });
 
 // Post method to generate a new random 6 character string and attach it as the key of the url entered in the form on urls/new

@@ -34,8 +34,12 @@ app.set("view engine", "ejs");
 
 // Database where all of our short URL IDs and longURL pairs are stored.
 const urlDatabase = {
-  b2xVn2: "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com",
+  b2xVn2: {
+    longURL: "http://www.lighthouselabs.ca",
+  },
+  "9sm5xK": {
+    longURL: "http://www.google.com",
+  },
 };
 
 // Database where all of our user and password information is stored.
@@ -108,19 +112,21 @@ app.get("/urls/new", (req, res) => {
 // Route handler for urls that are pointing at a specific ID in urlDatabase
 app.get("/urls/:id", (req, res) => {
   let exist = false;
+  console.log(req.params.id);
   for (const key in urlDatabase) {
     if (req.params.id === key) {
       exist = true;
     }
   }
   if (exist === false) {
-    res.status(403).send("Error SHORT URL does not exist");
+    // res.status(403);
+    res.send("Error SHORT URL does not exist");
   }
 
   const templateVars = {
     username: users[req.cookies["userID"]].email,
     id: req.params.id,
-    longURL: urlDatabase[req.params.id],
+    longURL: urlDatabase[req.params.id].longURL,
   };
   res.render("urls_show", templateVars);
 });
@@ -167,8 +173,9 @@ app.post("/urls", (req, res) => {
   } else {
     if (req.body.longURL !== "") {
       let newKey = generateRandomString();
-      urlDatabase[newKey] = req.body.longURL;
-      res.redirect(`/urls/:${newKey}`); // Redirects to urls/newKey
+      urlDatabase[newKey] = {};
+      urlDatabase[newKey].longURL = req.body.longURL;
+      res.redirect(`/urls/${newKey}`); // Redirects to urls/newKey
     }
   }
 });

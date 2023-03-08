@@ -40,15 +40,10 @@ const urlDatabase = {
 
 // Database where all of our user and password information is stored.
 const users = {
-  // Need the blank case, or else everything breaks on logout
+  // Need the undefined case, or else everything breaks on logout
   [undefined]: {
     email: "",
     id: "",
-    password: null,
-  },
-  "": {
-    id: "",
-    email: "",
     password: null,
   },
   // For test purposes only
@@ -104,6 +99,32 @@ app.get("/urls/:id", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
+// Route handler for viewing an individual URL
+app.get("/u/:id", (req, res) => {
+  const longURL = urlDatabase[req.params.id.slice(1)];
+  res.redirect(longURL);
+});
+
+// Route for the /register endpoint
+app.get("/register", (req, res) => {
+  const templateVars = {
+    username: users[req.session.userID].email,
+    urls: urlDatabase,
+    users,
+  };
+  res.render(`register`, templateVars);
+});
+
+// Route handler for the login page
+app.get("/login", (req, res) => {
+  const templateVars = {
+    username: users[req.session.userID].email,
+    urls: urlDatabase,
+    users,
+  };
+  res.render(`login`, templateVars);
+});
+
 // Post method to delete entries in our app!
 app.post("/urls/:id/delete", (req, res) => {
   if (req.session.userID === urlDatabase[req.params.id].userID) {
@@ -149,7 +170,7 @@ app.post("/logout", (req, res) => {
   console.log(req.session.userID);
   // Need this to clear the cookies and end our session
   req.session = null;
-  res.clearCookie(req.session.userID);
+
   // redirects to the /urls page
   res.redirect(`/urls`);
 });
@@ -167,22 +188,6 @@ app.post("/urls", (req, res) => {
       res.redirect(`/urls/${newKey}`); // Redirects to urls/newKey
     }
   }
-});
-
-// Route handler for viewing an individual URL
-app.get("/u/:id", (req, res) => {
-  const longURL = urlDatabase[req.params.id.slice(1)];
-  res.redirect(longURL);
-});
-
-// Route for the /register endpoint
-app.get("/register", (req, res) => {
-  const templateVars = {
-    username: users[req.session.userID].email,
-    urls: urlDatabase,
-    users,
-  };
-  res.render(`register`, templateVars);
 });
 
 // Post method for user registration!
@@ -210,15 +215,6 @@ app.post("/userReg", (req, res) => {
   res.cookie("userID", newUserID);
   // redirects to the /urls page
   res.redirect(`/urls`);
-});
-
-app.get("/login", (req, res) => {
-  const templateVars = {
-    username: users[req.session.userID].email,
-    urls: urlDatabase,
-    users,
-  };
-  res.render(`login`, templateVars);
 });
 
 // When you connect to the server using node express_server.js, it should read "Example app listening on port 8080". Otherwise it's not working right!

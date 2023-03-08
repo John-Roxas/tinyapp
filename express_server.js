@@ -1,9 +1,9 @@
-const express = require("express");
-const app = express();
-const PORT = 8080; // default port 8080
 const cookieParser = require("cookie-parser");
 const cookiesession = require("cookie-session");
 const bcrypt = require("bcryptjs");
+const express = require("express");
+const app = express();
+const PORT = 8080; // default port 8080
 
 // In order to expose req.cookies. We must first run the cookieParser() function on our app! This function parses the cookier header on the request.
 app.use(cookieParser());
@@ -49,8 +49,6 @@ const urlsForUser = (id, users) => {
   return resultObject;
 };
 
-app.set("view engine", "ejs");
-
 // Database where all of our short URL IDs and longURL pairs are stored.
 const urlDatabase = {
   b2xVn2: {
@@ -88,28 +86,12 @@ const users = {
   },
 };
 
+app.set("view engine", "ejs");
 // Important that this comes before all of our routes!
 app.use(express.urlencoded({ extended: true }));
 
-app.get("/", (req, res) => {
-  res.send("Hello!");
-});
-
-// Route to get the links in urlDatabase and print is out as a json object
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
-});
-
-// Route to print out Hello World with world bolded.
-app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>\n");
-});
-
-// Route handlers for urls
+// Route handlers for urls (our homepage)
 app.get("/urls", (req, res) => {
-  // req.session.userID = "testsession";
-  console.log(req.session.userID);
-
   const templateVars = {
     username: users[req.session.userID].email,
     urls: urlsForUser(req.session.userID, urlDatabase),

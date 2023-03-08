@@ -146,9 +146,12 @@ app.post("/login", (req, res) => {
 // Post method to handle logouts
 app.post("/logout", (req, res) => {
   // clears the cookie when you hit the logout button.
+  console.log(req.session.userID);
+  // Need this to clear the cookies and end our session
+  req.session = null;
   res.clearCookie(req.session.userID);
   // redirects to the /urls page
-  res.redirect(`/login`);
+  res.redirect(`/urls`);
 });
 
 // Post method to generate a new random 6 character string and attach it as the key of the url entered in the form on urls/new

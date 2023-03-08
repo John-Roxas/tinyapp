@@ -2,10 +2,17 @@ const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
 const cookieParser = require("cookie-parser");
+const cookiesession = require("cookie-session");
 const bcrypt = require("bcryptjs");
 
 // In order to expose req.cookies. We must first run the cookieParser() function on our app! This function parses the cookier header on the request.
 app.use(cookieParser());
+app.use(
+  cookiesession({
+    name: "session",
+    keys: ["key1"],
+  })
+);
 
 // Global function to generate a 6 character random string when called.
 const generateRandomString = () => {
@@ -100,9 +107,12 @@ app.get("/hello", (req, res) => {
 
 // Route handlers for urls
 app.get("/urls", (req, res) => {
+  // req.session.userID = "testsession";
+  console.log(req.session.userID);
+
   const templateVars = {
-    username: users[req.cookies["userID"]].email,
-    urls: urlsForUser(req.cookies["userID"], urlDatabase),
+    username: users[req.session.userID].email,
+    urls: urlsForUser(req.session.userID, urlDatabase),
     users,
   };
   res.render("urls_index", templateVars);
@@ -111,7 +121,7 @@ app.get("/urls", (req, res) => {
 // Route handler for entering new URLs
 app.get("/urls/new", (req, res) => {
   const templateVars = {
-    username: users[req.cookies["userID"]].email,
+    username: users[req.session.userID].email,
     urls: urlDatabase,
   };
 
@@ -132,7 +142,7 @@ app.get("/urls/:id", (req, res) => {
   }
 
   const templateVars = {
-    username: users[req.cookies["userID"]].email,
+    username: users[req.session.userID].email,
     id: req.params.id,
     longURL: urlDatabase[req.params.id].longURL,
   };
@@ -141,7 +151,7 @@ app.get("/urls/:id", (req, res) => {
 
 // Post method to delete entries in our app!
 app.post("/urls/:id/delete", (req, res) => {
-  if (req.cookies["userID"] === urlDatabase[req.params.id].userID) {
+  if (req.session.userID === urlDatabase[req.params.id].userID) {
     delete urlDatabase[req.params.id];
   } else {
     res.send("You cannot delete short URLS you do not own!");
@@ -173,7 +183,7 @@ app.post("/login", (req, res) => {
     res.status(403).send("Error 403 INCORRECT PASSWORD");
   } else {
     // sets the cookie username to what gets entered in the login form.
-    res.cookie("userID", loginKey);
+    req.session.userID = loginKey;
     res.redirect(`/urls`);
   }
 });
@@ -181,21 +191,21 @@ app.post("/login", (req, res) => {
 // Post method to handle logouts
 app.post("/logout", (req, res) => {
   // clears the cookie when you hit the logout button.
-  res.clearCookie("userID");
+  res.clearCookie(req.session.userID);
   // redirects to the /urls page
   res.redirect(`/login`);
 });
 
 // Post method to generate a new random 6 character string and attach it as the key of the url entered in the form on urls/new
 app.post("/urls", (req, res) => {
-  if (req.cookies["userID"] === undefined || req.cookies["userID"] === "") {
+  if (req.session.userID === undefined || req.session.userID === "") {
     res.send("Error, must be logged in to create new short URLs");
   } else {
     if (req.body.longURL !== "") {
       let newKey = generateRandomString();
       urlDatabase[newKey] = {};
       urlDatabase[newKey].longURL = req.body.longURL;
-      urlDatabase[newKey].userID = req.cookies["userID"];
+      urlDatabase[newKey].userID = req.session.userID;
       res.redirect(`/urls/${newKey}`); // Redirects to urls/newKey
     }
   }
@@ -210,7 +220,7 @@ app.get("/u/:id", (req, res) => {
 // Route for the /register endpoint
 app.get("/register", (req, res) => {
   const templateVars = {
-    username: users[req.cookies["userID"]].email,
+    username: users[req.session.userID].email,
     urls: urlDatabase,
     users,
   };
@@ -246,7 +256,7 @@ app.post("/userReg", (req, res) => {
 
 app.get("/login", (req, res) => {
   const templateVars = {
-    username: users[req.cookies["userID"]].email,
+    username: users[req.session.userID].email,
     urls: urlDatabase,
     users,
   };

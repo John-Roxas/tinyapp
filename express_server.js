@@ -27,14 +27,23 @@ const urlDatabase = {
   b2xVn2: {
     longURL: "http://www.lighthouselabs.ca",
     userID: "EXAMPLE",
+    totalVisits: 0,
+    uniqueVisits: 0,
+    uniqueVisitors: [],
   },
   "9sm5xK": {
     longURL: "http://www.google.com",
     userID: "EXAMPLE",
+    totalVisits: 0,
+    uniqueVisits: 0,
+    uniqueVisitors: [],
   },
   b2xVn5: {
     longURL: "https://www.youtube.com",
     userID: "test32",
+    totalVisits: 0,
+    uniqueVisits: 0,
+    uniqueVisitors: [],
   },
 };
 
@@ -87,14 +96,35 @@ app.get("/urls/:id", (req, res) => {
     }
   }
   if (exist === false) {
-    // res.status(403);
     res.send("Error SHORT URL does not exist");
+  }
+  // Tracks total visits to a URL
+  urlDatabase[req.params.id].totalVisits += 1;
+
+  // Start of code block to track unique visits
+  let unique = true;
+  // If the stored cookie matches one of the cookies in our list of cookies (stored in each short URL object), set to false and jump out of the loop, This will then skip past
+  // the next code block and jump into rendering the page.
+  for (const element of urlDatabase[req.params.id].uniqueVisitors) {
+    if (req.cookies["uniqueID"] === element) {
+      unique = false;
+      break;
+    }
+  }
+  // If we see a truly unique user, set a new cookie using our handy generateRandomString function and store it in our list of uniqueIDs within that shortURL object.
+  if (unique === true) {
+    let uniqueID = generateRandomString();
+    res.cookie("uniqueID", uniqueID);
+    urlDatabase[req.params.id].uniqueVisits += 1;
+    urlDatabase[req.params.id].uniqueVisitors.push(uniqueID);
   }
 
   const templateVars = {
     username: users[req.session.userID].email,
     id: req.params.id,
     longURL: urlDatabase[req.params.id].longURL,
+    totalVisits: urlDatabase[req.params.id].totalVisits,
+    uniqueVisits: urlDatabase[req.params.id].uniqueVisits,
   };
   res.render("urls_show", templateVars);
 });

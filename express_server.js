@@ -28,6 +28,7 @@ const urlDatabase = {
     longURL: "http://www.lighthouselabs.ca",
     userID: "EXAMPLE",
     totalVisits: 0,
+    visitTracker: {},
     uniqueVisits: 0,
     uniqueVisitors: [],
   },
@@ -35,6 +36,7 @@ const urlDatabase = {
     longURL: "http://www.google.com",
     userID: "EXAMPLE",
     totalVisits: 0,
+    visitTracker: {},
     uniqueVisits: 0,
     uniqueVisitors: [],
   },
@@ -42,6 +44,7 @@ const urlDatabase = {
     longURL: "https://www.youtube.com",
     userID: "test32",
     totalVisits: 0,
+    visitTracker: {},
     uniqueVisits: 0,
     uniqueVisitors: [],
   },
@@ -57,8 +60,8 @@ const users = {
   },
   // For test purposes only
   test32: {
-    id: "user3RandomID",
-    email: "test@test.com",
+    id: "test32",
+    email: "test32@test.com",
     password: bcrypt.hashSync("test", 10),
   },
 };
@@ -98,8 +101,18 @@ app.get("/urls/:id", (req, res) => {
   if (exist === false) {
     res.send("Error SHORT URL does not exist");
   }
+
+  // Determines the date/ time at the moment we open the page for urls/:id in terms of PST timezone and stores as currentTime.
+  const currentTime = JSON.stringify(
+    new Date().toLocaleString("en-US", {
+      timeZone: "America/Vancouver",
+    })
+  );
+
   // Tracks total visits to a URL
   urlDatabase[req.params.id].totalVisits += 1;
+  urlDatabase[req.params.id].visitTracker["V" + generateRandomString()] =
+    currentTime;
 
   // Start of code block to track unique visits
   let unique = true;
@@ -118,13 +131,13 @@ app.get("/urls/:id", (req, res) => {
     urlDatabase[req.params.id].uniqueVisits += 1;
     urlDatabase[req.params.id].uniqueVisitors.push(uniqueID);
   }
-
   const templateVars = {
     username: users[req.session.userID].email,
     id: req.params.id,
     longURL: urlDatabase[req.params.id].longURL,
     totalVisits: urlDatabase[req.params.id].totalVisits,
     uniqueVisits: urlDatabase[req.params.id].uniqueVisits,
+    visitTracker: urlDatabase[req.params.id].visitTracker,
   };
   res.render("urls_show", templateVars);
 });

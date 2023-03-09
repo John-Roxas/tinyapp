@@ -44,6 +44,38 @@
       </div>
       <p class="card-text">Total Visits to this Page: <%= totalVisits %></p>
       <p class="card-text">Unique Visitors to this Page: <%= uniqueVisits %></p>
+      <% if(username !== "") { %>
+      <div class=".container">
+        <table class="table">
+          <thead>
+            <tr>
+              <th {
+                scope="col"
+                style="width:33%"
+                }>Visitor #</th>
+              <th {
+                scope="col"
+                style="width:33%"
+                }>ID</th>
+              <th {
+                scope="col"
+                style="width:33%"
+                }>Time</th>
+            </tr>  
+          </thead>
+          <tbody>
+            <% var count = 0 %>
+            <% for (const key in visitTracker){ %>
+                <tr>
+                  <td><%= count += 1 %></td>
+                  <td><%= key %></td>
+                  <td><%= visitTracker[key] %></td>
+                </tr>
+              <% } %>
+          </tbody>
+        </table>
+      </div>
+        <% } %>
       <div class="card-footer text-muted">
 
       </div>

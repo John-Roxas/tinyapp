@@ -99,7 +99,7 @@ app.get("/urls/:id", (req, res) => {
     }
   }
   if (exist === false) {
-    res.send("Error SHORT URL does not exist");
+    res.status(403).send("Error SHORT URL does not exist");
   }
 
   // Determines the date/ time at the moment we open the page for urls/:id in terms of PST timezone and stores as currentTime.

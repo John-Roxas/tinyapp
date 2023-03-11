@@ -4,12 +4,16 @@ TinyApp is a full stack web application built with Node and Express that allows 
 This app was built as part of the LighthouseLabs curriculum with help from very helpful mentors who helped me understand 
 
 ## Final Product
-
-!["TinyApp Home Page!"](./screenshots/homePage.png)(#)
-!["Login page!"](./screenshots/login.png)(#)
-!["Registration page!"](./screenshots/regPage.png)(#)
-!["New Short URL page!"](./screenshots/newURL.png)(#)
-!["Short URL view page!"](./screenshots/urlView.png)(#)
+TinyApp Home Page
+!["TinyApp Home Page!"](./screenshots/homePage.png)
+Login Page
+!["Login page!"](./screenshots/login.png)
+Registration Page
+!["Registration page!"](./screenshots/regPage.png)
+New Short URL page
+!["New Short URL page!"](./screenshots/newURL.png)
+Short URL View Page
+!["Short URL view page!"](./screenshots/urlView.png)
 
 ## Dependencies
 

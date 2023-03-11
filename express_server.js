@@ -2,6 +2,7 @@ const cookieParser = require("cookie-parser");
 const cookiesession = require("cookie-session");
 const bcrypt = require("bcryptjs");
 const express = require("express");
+const salt = bcrypt.genSaltSync(10);
 
 // Helper functions from helper.js
 const {
@@ -62,13 +63,18 @@ const users = {
   test32: {
     id: "test32",
     email: "test32@test.com",
-    password: bcrypt.hashSync("test", 10),
+    password: bcrypt.hashSync("test", salt),
   },
 };
 
 app.set("view engine", "ejs");
 // Important that this comes before all of our routes!
 app.use(express.urlencoded({ extended: true }));
+
+// When you connect to the server using node express_server.js, it should read "Example app listening on port 8080". Otherwise it's not working right!
+app.listen(PORT, () => {
+  console.log(`Example app listening on port ${PORT}!`);
+});
 
 // Route handlers for urls (our homepage)
 app.get("/urls", (req, res) => {
@@ -210,7 +216,7 @@ app.post("/login", (req, res) => {
 // Post method to handle logouts
 app.post("/logout", (req, res) => {
   // clears the cookie when you hit the logout button.
-  console.log(req.session.userID);
+
   // Need this to clear the cookies and end our session
   req.session = null;
 
@@ -264,9 +270,4 @@ app.post("/userReg", (req, res) => {
   res.cookie("userID", newUserID);
   // redirects to the /urls page
   res.redirect(`/urls`);
-});
-
-// When you connect to the server using node express_server.js, it should read "Example app listening on port 8080". Otherwise it's not working right!
-app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}!`);
 });

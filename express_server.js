@@ -24,32 +24,7 @@ app.use(
 );
 
 // Database where all of our short URL IDs and longURL pairs are stored.
-const urlDatabase = {
-  b2xVn2: {
-    longURL: "http://www.lighthouselabs.ca",
-    userID: "EXAMPLE",
-    totalVisits: 0,
-    visitTracker: {},
-    uniqueVisits: 0,
-    uniqueVisitors: [],
-  },
-  "9sm5xK": {
-    longURL: "http://www.google.com",
-    userID: "EXAMPLE",
-    totalVisits: 0,
-    visitTracker: {},
-    uniqueVisits: 0,
-    uniqueVisitors: [],
-  },
-  b2xVn5: {
-    longURL: "https://www.youtube.com",
-    userID: "test32",
-    totalVisits: 0,
-    visitTracker: {},
-    uniqueVisits: 0,
-    uniqueVisitors: [],
-  },
-};
+const urlDatabase = {};
 
 // Database where all of our user and password information is stored.
 const users = {
@@ -58,12 +33,6 @@ const users = {
     email: "",
     id: "",
     password: null,
-  },
-  // For test purposes only
-  test32: {
-    id: "test32",
-    email: "test32@test.com",
-    password: bcrypt.hashSync("test", salt),
   },
 };
 

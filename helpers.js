@@ -19,7 +19,7 @@ const emailLookup = (email, users) => {
       return key;
     }
   }
-  return undefined;
+  return "";
 };
 
 // Global function to sort through all urls for a certain userID.

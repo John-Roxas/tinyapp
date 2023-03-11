@@ -228,6 +228,11 @@ app.post("/urls", (req, res) => {
       urlDatabase[newKey] = {};
       urlDatabase[newKey].longURL = req.body.longURL;
       urlDatabase[newKey].userID = req.session.userID;
+      // Need to initialize these in order for the view counter to work properly!
+      urlDatabase[newKey].totalVisits = 0;
+      urlDatabase[newKey].visitTracker = {};
+      urlDatabase[newKey].uniqueVisits = 0;
+      urlDatabase[newKey].uniqueVisitors = [];
       res.redirect(`/urls/${newKey}`); // Redirects to urls/newKey
     }
   }
@@ -240,12 +245,13 @@ app.post("/userReg", (req, res) => {
   const newUserID = generateRandomString();
   if (req.body.newEmail === "" || req.body.newPassword === "") {
     // Send an error if the user tries to register with either a blank email address or blank password field
-    res.status(400);
-    res.send("Cannot accept an empty username or password. Try Again!");
+    res
+      .status(400)
+      .send("Cannot accept an empty username or password. Try Again!");
   } else if (emailLookup(req.body.newEmail, users) !== "") {
+    console.log(req.body.newEmail);
     // Send an error IF the user tries to register an email that is already in the database
-    res.status(400);
-    res.send("User is already registered! Try Again!");
+    res.status(400).send("User is already registered! Try Again!");
   } else {
     users[newUserID] = {
       id: newUserID,

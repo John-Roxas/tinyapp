@@ -61,6 +61,9 @@ app.get("/urls", (req, res) => {
 
 // Route handler for entering new URLs
 app.get("/urls/new", (req, res) => {
+  if (!req.session.userID) {
+    res.status(403).send("Need to be logged in to access! Log in or register!");
+  }
   const templateVars = {
     username: users[req.session.userID].email,
     urls: urlDatabase,

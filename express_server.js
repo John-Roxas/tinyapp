@@ -40,11 +40,6 @@ app.set("view engine", "ejs");
 // Important that this comes before all of our routes!
 app.use(express.urlencoded({ extended: true }));
 
-// When you connect to the server using node express_server.js, it should read "Example app listening on port 8080". Otherwise it's not working right!
-app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}!`);
-});
-
 // Route handlers for urls (our homepage)
 app.get("/urls", (req, res) => {
   if (!req.session.userID) {
@@ -262,4 +257,9 @@ app.post("/userReg", (req, res) => {
   }
   // redirects to the /urls page
   res.redirect(`/urls`);
+});
+
+// When you connect to the server using node express_server.js, it should read "Example app listening on port 8080". Otherwise it's not working right!
+app.listen(PORT, () => {
+  console.log(`Example app listening on port ${PORT}!`);
 });

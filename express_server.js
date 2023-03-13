@@ -47,6 +47,10 @@ app.listen(PORT, () => {
 
 // Route handlers for urls (our homepage)
 app.get("/urls", (req, res) => {
+  if (!req.session.userID) {
+    res.status(403).send("Need to be logged in to access! Log in or register!");
+  }
+
   const templateVars = {
     username: users[req.session.userID].email,
     urls: urlsForUser(req.session.userID, urlDatabase),
@@ -117,6 +121,7 @@ app.get("/urls/:id", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
+// Route handler for our landing page. Redirect to login!
 app.get("/", (req, res) => {
   res.redirect(`login`);
 });

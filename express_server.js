@@ -84,6 +84,18 @@ app.get("/urls/:id", (req, res) => {
     res.status(403).send("Error SHORT URL does not exist");
   }
 
+  //
+  if (
+    !req.session.userID ||
+    req.session.userID !== urlDatabase[req.params.id].userID
+  ) {
+    res
+      .status(403)
+      .send(
+        "You are not authorized to view the details for this shortURL! Please login using the correct details!"
+      );
+  }
+
   // Determines the date/ time at the moment we open the page for urls/:id in terms of PST timezone and stores as currentTime.
   const currentTime = JSON.stringify(
     new Date().toLocaleString("en-US", {

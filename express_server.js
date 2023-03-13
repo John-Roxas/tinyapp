@@ -202,7 +202,7 @@ app.post("/logout", (req, res) => {
   req.session = null;
 
   // redirects to the /urls page
-  res.redirect(`/urls`);
+  res.redirect(`login`);
 });
 
 // Post method to generate a new random 6 character string and attach it as the key of the url entered in the form on urls/new

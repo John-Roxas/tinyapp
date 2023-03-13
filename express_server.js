@@ -131,7 +131,7 @@ app.get("/", (req, res) => {
 
 // Route handler for viewing an individual URL
 app.get("/u/:id", (req, res) => {
-  const longURL = urlDatabase[req.params.id.slice(1)];
+  const longURL = urlDatabase[req.params.id].longURL;
   res.redirect(longURL);
 });
 

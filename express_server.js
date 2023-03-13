@@ -117,6 +117,10 @@ app.get("/urls/:id", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
+app.get("/", (req, res) => {
+  res.redirect(`login`);
+});
+
 // Route handler for viewing an individual URL
 app.get("/u/:id", (req, res) => {
   const longURL = urlDatabase[req.params.id.slice(1)];

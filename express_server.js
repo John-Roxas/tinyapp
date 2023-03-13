@@ -164,6 +164,10 @@ app.get("/login", (req, res) => {
 
 // Post method to delete entries in our app!
 app.post("/urls/:id/delete", (req, res) => {
+  if (req.session.userID === undefined || req.session.userID === "") {
+    res.send("Error, must be logged in to delete shortURLs!");
+  }
+
   if (req.session.userID === urlDatabase[req.params.id].userID) {
     delete urlDatabase[req.params.id];
   } else {

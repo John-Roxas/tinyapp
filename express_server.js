@@ -233,10 +233,9 @@ app.post("/userReg", (req, res) => {
       email: req.body.newEmail,
       password: bcrypt.hashSync(req.body.newPassword, 10),
     };
+    // 12MAR_23 Added after first evaluation. Now when a new user is created, user should now be logged in with their new credentials!
+    req.session.userID = newUserID;
   }
-
-  // Sets a user_id cookie using the new user's generated ID.
-  res.cookie("userID", newUserID);
   // redirects to the /urls page
   res.redirect(`/urls`);
 });

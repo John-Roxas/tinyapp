@@ -27,7 +27,7 @@ describe("emailLookup", function () {
   });
   it('should return "" if an invalid email is entered', () => {
     const user = emailLookup("DOES NOT EXIST", testUsers);
-    const expectedUserID = undefined;
+    const expectedUserID = "";
     assert.strictEqual(user, expectedUserID);
   });
 });

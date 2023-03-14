@@ -40,6 +40,14 @@ app.set("view engine", "ejs");
 // Important that this comes before all of our routes!
 app.use(express.urlencoded({ extended: true }));
 
+// Route handler for our landing page. Redirect to login!
+app.get("/", (req, res) => {
+  // List of commonly used variables
+  const params = req.params.id;
+  const urlDatabaseParams = urlDatabase[params];
+  res.redirect(`login`);
+});
+
 // Route handlers for urls (our homepage)
 app.get("/urls", (req, res) => {
   if (!req.session.userID) {
@@ -69,9 +77,11 @@ app.get("/urls/new", (req, res) => {
 
 // Route handler for urls that are pointing at a specific ID in urlDatabase
 app.get("/urls/:id", (req, res) => {
+  const params = req.params.id;
+  const urlDatabaseParams = urlDatabase[params];
   let exist = false;
   for (const key in urlDatabase) {
-    if (req.params.id === key) {
+    if (params === key) {
       exist = true;
     }
   }
@@ -80,10 +90,7 @@ app.get("/urls/:id", (req, res) => {
   }
 
   //
-  if (
-    !req.session.userID ||
-    req.session.userID !== urlDatabase[req.params.id].userID
-  ) {
+  if (!req.session.userID || req.session.userID !== urlDatabaseParams.userID) {
     res
       .status(403)
       .send(
@@ -99,15 +106,14 @@ app.get("/urls/:id", (req, res) => {
   );
 
   // Tracks total visits to a URL
-  urlDatabase[req.params.id].totalVisits += 1;
-  urlDatabase[req.params.id].visitTracker["V" + generateRandomString()] =
-    currentTime;
+  urlDatabaseParams.totalVisits += 1;
+  urlDatabaseParams.visitTracker["V" + generateRandomString()] = currentTime;
 
   // Start of code block to track unique visits
   let unique = true;
   // If the stored cookie matches one of the cookies in our list of cookies (stored in each short URL object), set to false and jump out of the loop, This will then skip past
   // the next code block and jump into rendering the page.
-  for (const element of urlDatabase[req.params.id].uniqueVisitors) {
+  for (const element of urlDatabaseParams.uniqueVisitors) {
     if (req.cookies["uniqueID"] === element) {
       unique = false;
       break;
@@ -117,28 +123,24 @@ app.get("/urls/:id", (req, res) => {
   if (unique === true) {
     let uniqueID = generateRandomString();
     res.cookie("uniqueID", uniqueID);
-    urlDatabase[req.params.id].uniqueVisits += 1;
-    urlDatabase[req.params.id].uniqueVisitors.push(uniqueID);
+    urlDatabaseParams.uniqueVisits += 1;
+    urlDatabaseParams.uniqueVisitors.push(uniqueID);
   }
   const templateVars = {
     username: users[req.session.userID].email,
-    id: req.params.id,
-    longURL: urlDatabase[req.params.id].longURL,
-    totalVisits: urlDatabase[req.params.id].totalVisits,
-    uniqueVisits: urlDatabase[req.params.id].uniqueVisits,
-    visitTracker: urlDatabase[req.params.id].visitTracker,
+    id: params,
+    longURL: urlDatabaseParams.longURL,
+    totalVisits: urlDatabaseParams.totalVisits,
+    uniqueVisits: urlDatabaseParams.uniqueVisits,
+    visitTracker: urlDatabaseParams.visitTracker,
   };
   res.render("urls_show", templateVars);
 });
 
-// Route handler for our landing page. Redirect to login!
-app.get("/", (req, res) => {
-  res.redirect(`login`);
-});
-
 // Route handler for viewing an individual URL
 app.get("/u/:id", (req, res) => {
-  const longURL = urlDatabase[req.params.id].longURL;
+  const urlDatabaseParams = urlDatabase[req.params.id];
+  const longURL = urlDatabaseParams.longURL;
   res.redirect(longURL);
 });
 
@@ -164,12 +166,13 @@ app.get("/login", (req, res) => {
 
 // Post method to delete entries in our app!
 app.post("/urls/:id/delete", (req, res) => {
+  const urlDatabaseParams = urlDatabase[req.params.id];
   if (req.session.userID === undefined || req.session.userID === "") {
     res.send("Error, must be logged in to delete shortURLs!");
   }
 
-  if (req.session.userID === urlDatabase[req.params.id].userID) {
-    delete urlDatabase[req.params.id];
+  if (req.session.userID === urlDatabaseParams.userID) {
+    delete urlDatabaseParams;
   } else {
     res.send("You cannot delete short URLS you do not own!");
   }
@@ -179,9 +182,10 @@ app.post("/urls/:id/delete", (req, res) => {
 
 // Post method which edits the LongURLs in our app!
 app.post("/urls/:id/edit", (req, res) => {
+  const urlDatabaseParams = urlDatabase[req.params.id];
   // the if statement will allow edits only IF we are the correct user
-  if (req.cookies["userID"] === urlDatabase[req.params.id].userID) {
-    urlDatabase[req.params.id].longURL = req.body.longURL;
+  if (req.session.userID === urlDatabaseParams.userID) {
+    urlDatabaseParams.longURL = req.body.longURL;
   }
 
   res.redirect(`/urls`);
@@ -223,14 +227,17 @@ app.post("/urls", (req, res) => {
   } else {
     if (req.body.longURL !== "") {
       let newKey = generateRandomString();
+
       urlDatabase[newKey] = {};
-      urlDatabase[newKey].longURL = req.body.longURL;
-      urlDatabase[newKey].userID = req.session.userID;
+
+      let newURLKey = urlDatabase[newKey];
+      newURLKey.longURL = req.body.longURL;
+      newURLKey.userID = req.session.userID;
       // Need to initialize these in order for the view counter to work properly!
-      urlDatabase[newKey].totalVisits = 0;
-      urlDatabase[newKey].visitTracker = {};
-      urlDatabase[newKey].uniqueVisits = 0;
-      urlDatabase[newKey].uniqueVisitors = [];
+      newURLKey.totalVisits = 0;
+      newURLKey.visitTracker = {};
+      newURLKey.uniqueVisits = 0;
+      newURLKey.uniqueVisitors = [];
       res.redirect(`/urls/${newKey}`); // Redirects to urls/newKey
     }
   }
@@ -241,20 +248,21 @@ app.post("/urls", (req, res) => {
 
 app.post("/userReg", (req, res) => {
   const newUserID = generateRandomString();
-  if (req.body.newEmail === "" || req.body.newPassword === "") {
+  const body = req.body;
+  if (body.newEmail === "" || body.newPassword === "") {
     // Send an error if the user tries to register with either a blank email address or blank password field
     res
       .status(400)
       .send("Cannot accept an empty username or password. Try Again!");
-  } else if (emailLookup(req.body.newEmail, users) !== "") {
-    console.log(req.body.newEmail);
+  } else if (emailLookup(body.newEmail, users) !== "") {
+    console.log(body.newEmail);
     // Send an error IF the user tries to register an email that is already in the database
     res.status(400).send("User is already registered! Try Again!");
   } else {
     users[newUserID] = {
       id: newUserID,
-      email: req.body.newEmail,
-      password: bcrypt.hashSync(req.body.newPassword, 10),
+      email: body.newEmail,
+      password: bcrypt.hashSync(body.newPassword, 10),
     };
     // 12MAR_23 Added after first evaluation. Now when a new user is created, user should now be logged in with their new credentials!
     req.session.userID = newUserID;

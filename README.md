@@ -27,7 +27,7 @@ Short URL View Page
 
 - Install all dependencies (using the `npm install` command).
 - Run the development web server using the `node express_server.js` command.
-- Navigate to http://localhost:8080/urls to get started!
+- Navigate to http://localhost:8080/ to get started!
 - Create a new account using the app registration page!
 
 ## Some interesting notes

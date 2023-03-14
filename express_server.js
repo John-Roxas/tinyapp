@@ -166,13 +166,12 @@ app.get("/login", (req, res) => {
 
 // Post method to delete entries in our app!
 app.post("/urls/:id/delete", (req, res) => {
-  const urlDatabaseParams = urlDatabase[req.params.id];
   if (req.session.userID === undefined || req.session.userID === "") {
     res.send("Error, must be logged in to delete shortURLs!");
   }
 
-  if (req.session.userID === urlDatabaseParams.userID) {
-    delete urlDatabaseParams;
+  if (req.session.userID === urlDatabase[req.params.id].userID) {
+    delete urlDatabase[req.params.id];
   } else {
     res.send("You cannot delete short URLS you do not own!");
   }
